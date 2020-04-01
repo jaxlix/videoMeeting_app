@@ -14,9 +14,12 @@
     "fastclick": "^1.0.6",
     "mint-ui": "^2.2.13",
     "vconsole": "^3.3.2",
+    "underscore": "^1.9.1",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "kurento-utils": "^6.13.1",
+    "webrtc-adapter": "^7.5.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",

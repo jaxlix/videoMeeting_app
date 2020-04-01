@@ -12,6 +12,9 @@ import common from '@/js/common.js'
 import { Button, Toast, MessageBox, Header, Tabbar, TabItem, Search, Cell, Popup, Checklist, Radio } from 'mint-ui'
 import 'mint-ui/lib/style.css'
 
+import meetingApi from './js/meeting.js'
+Vue.prototype.$meetingApi = meetingApi
+
 Vue.component(Button.name, Button)
 Vue.component(Header.name, Header)
 Vue.component(Tabbar.name, Tabbar)
@@ -30,6 +33,7 @@ export default Vconsole
 Vue.prototype.$post = post
 Vue.prototype.$get = get
 Vue.prototype.$api = api
+
 FastClick.attach(document.body)
 
 Vue.prototype.$common = common

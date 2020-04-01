@@ -80,3 +80,28 @@ export function post (url, data) {
       })
   })
 }
+
+ /**
+ * 封装post请求,data为json
+ * @param url
+ * @param data
+ * @returns {Promise}
+ */
+
+export function postJson( url, data ){
+  return new Promise(( resolve, reject ) => {
+    axios({
+      method: "post", 
+      url: url,
+      headers: { 
+       'content-type': 'application/json'
+      },
+      data:data,
+    })
+     .then(response => {
+       resolve(response.data);
+     },err => {
+       reject(err)
+     })
+  })
+}

@@ -8,6 +8,8 @@ export default new Vuex.Store({
     identity: "", // 警种
     status: "",  // 状态
     checked: {},  // 选中列表，id为键名
+    meetingWsConnected: false,
+
   },
   getters: {
     identity (state) {
@@ -19,6 +21,9 @@ export default new Vuex.Store({
     checked (state) {
       return state.checked
     },
+    meetingWsConnected(state) {
+      return state.meetingWsConnected
+    },
   },
   mutations: {
     setIdentity(state, res){
@@ -29,6 +34,9 @@ export default new Vuex.Store({
     },
     setChecked(state, res) {
       state.checked = res
-    }
+    },
+    setMeetingWsConnected(state, res) {
+      state.meetingWsConnected = res
+    },
   }
 })
