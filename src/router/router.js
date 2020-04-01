@@ -18,19 +18,19 @@ export default new Router({
       component: () => import('@/views/attendees/attendees')
     },
     {
-      path: '/patrolPolice',
-      name: 'patrolPolice',
-      component: () => import('@/views/patrolPolice/index')
+      path: '/meeting',
+      name: 'meeting',
+      component: () => import('@/views/meeting/meeting')
     },
     {
-      path: '/railwayPolice',
-      name: 'railwayPolice',
-      component: () => import('@/views/railwayPolice/index')
+      path: '/search',
+      name: 'search',
+      component: () => import('@/views/search/search')
     },
     {
-      path: '/review',
-      name: 'review',
-      component: () => import('@/views/railwayPolice/review')
+      path: '/addPhone',
+      name: 'addPhone',
+      component: () => import('@/views/addPhone/addPhone')
     }
   ]
 })

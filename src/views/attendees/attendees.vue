@@ -5,7 +5,8 @@
             <div class="item" v-for="(d, i) in collect" :key="i">
                 <i class="icon-collect"></i>
                 <span class="name">{{d.name}}</span>
-                <i :class="checkedCol[d.id] ? 'icon-check icon-checked' : 'icon-check'"></i>
+                <i :class="d.collect ? 'icon-xing icon-xing_sc' : 'icon-xing'" @click="clickCollect(i)"></i>
+                <i class="icon-del"></i>
             </div>
         </div>
     </div>
@@ -16,28 +17,7 @@ import Header from "@/components/Header";
 export default {
     data() {
         return {
-            collect: [
-                {
-                    id: 1,
-                    name: "开大会"
-                },
-                {
-                    id: 2,
-                    name: "部门会议"
-                },
-                {
-                    id: 3,
-                    name: "大会2"
-                },
-                {
-                    id: 4,
-                    name: "开大会3"
-                },
-                {
-                    id: 5,
-                    name: "开大会4"
-                }
-            ],
+            collect: [],
             checkedCol: {}
         }
     },
@@ -46,6 +26,9 @@ export default {
     },
     methods: {
         
+    },
+    created(){
+        this.collect = this.$store.state.checked
     }
 };
 </script>
@@ -95,16 +78,23 @@ export default {
                 margin-left: 10px;
                 text-align: left;
             }
-            .icon-check{
+            .icon-xing{
                 width: 24px;
                 height: 24px;
                 padding: 8px 10px;
-                background: url(../../assets/icon-check.png) center center no-repeat;
+                background: url(../../assets/xing.png) center center no-repeat;
                 background-size: 24px 24px;
-                &.icon-checked{
-                    background: url(../../assets/icon-checked.png) center center no-repeat;
+                &.icon-xing_sc{
+                    background: url(../../assets/xing_sc.png) center center no-repeat;
                     background-size: 24px 24px;
                 }
+            }
+            .icon-del{
+                width: 20px;
+                height: 20px;
+                padding: 8px 10px;
+                background: url(../../assets/del.png) center center no-repeat;
+                background-size: 20px 20px;
             }
         }
     }

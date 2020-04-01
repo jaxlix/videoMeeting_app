@@ -22,7 +22,7 @@
         </mt-button>
         <!-- 已选择列表 -->
         <mt-button v-if="rightBtn == 'toCheckedList'" class="right-btn" @click="toCheckedList">
-            已选择（0）
+            已选择（{{checkNum}}）
         </mt-button>
     </header>
 </template>
@@ -52,7 +52,8 @@ export default {
                     label: "机关民警",
                     value: "CIVIL_POLICEMAN"
                 }
-            ]
+            ],
+            checkNum: 0
         }
     },
     props: {
@@ -62,7 +63,7 @@ export default {
         },
         back: {
             type: String,
-            default: "android"
+            default: "router"
         },
         rightBtn: {
             type: String,
@@ -71,7 +72,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            identity: "identity"
+            identity: "identity",
+            checked: "checked"
         })
     },
     watch: {
@@ -80,6 +82,9 @@ export default {
         },
         popupVisible(){
             this.identity2 = this.identity
+        },
+        checked(v){
+            this.checkNum = Object.keys(v).length
         }
     },
     methods: {

@@ -1,34 +1,36 @@
 <template>
-    <div id="index">
+    <div id="index" ref="index">
         <Header title="发起视频会商" rightBtn="toCheckedList" />
-        <div class="cell">
+        <router-link to="/search" class="cell">
             <i class="icon-search"></i>
             <span>通讯录搜索</span>
-        </div>
-        <div class="cell">
+        </router-link>
+        <router-link to="/addPhone" class="cell">
             <i class="icon-addPhone"></i>
             <span>添加电话</span>
-        </div>
-        <div class="collect-box">
+        </router-link>
+        <div class="collect-box" ref="collect">
             <p class="title">收藏夹</p>
             <div class="scroll">
                 <div class="item" v-for="(d, i) in collect" :key="i" @click="checkCollect(d)">
                     <i class="icon-collect"></i>
                     <span class="name">{{d.name}}</span>
-                    <i :class="checkedCol[d.id] ? 'icon-check icon-checked' : 'icon-check'"></i>
+                    <i :class="checked[d.id] ? 'icon-check icon-checked' : 'icon-check'"></i>
                 </div>
             </div>
         </div>
-        <div class="contact-box">
+        <div class="contact-box" :style="setHeight">
             <p class="title">常用联系人</p>
             <div class="scroll">
-                <div class="item" v-for="(d, i) in contact" :key="i" @click="checkContact(d)">
+                <div class="item" v-for="(d, i) in contact" :key="i">
                     <i class="icon-collect"></i>
                     <span class="name">{{d.name}}</span>
-                    <i :class="checkedCon[d.id] ? 'icon-check icon-checked' : 'icon-check'"></i>
+                    <i :class="d.collect ? 'icon-xing icon-xing_sc' : 'icon-xing'" @click="clickCollect(i)"></i>
+                    <i :class="checked[d.id] ? 'icon-check icon-checked' : 'icon-check'" @click="checkContact(d)"></i>
                 </div>
             </div>
         </div>
+        <div class="footer-btn" @click="startMeeting">开始会商</div>
     </div>
 </template>
 
@@ -38,71 +40,39 @@ export default {
     data() {
         return {
             collect: [
-                // {
-                //     id: 1,
-                //     name: "开大会"
-                // },
-                // {
-                //     id: 2,
-                //     name: "部门会议"
-                // },
-                // {
-                //     id: 3,
-                //     name: "大会2"
-                // },
-                // {
-                //     id: 4,
-                //     name: "开大会3"
-                // },
-                // {
-                //     id: 5,
-                //     name: "开大会4"
-                // }
+                {
+                    id: 1,
+                    name: "开大会"
+                },
+                {
+                    id: 2,
+                    name: "部门会议"
+                }
             ],
-            checkedCol: {},
             contact: [
                 {
                     id: 6,
-                    name: "开大会"
+                    name: "开大会",
+                    collect: false
                 },
                 {
                     id: 7,
-                    name: "部门会议"
+                    name: "部门会议",
+                    collect: true
                 },
                 {
                     id: 8,
-                    name: "大会2"
+                    name: "大会2",
+                    collect: false
                 },
                 {
                     id: 9,
-                    name: "开大会3"
-                },
-                {
-                    id: 10,
-                    name: "开大会4"
-                },
-                {
-                    id: 11,
-                    name: "开大会"
-                },
-                {
-                    id: 12,
-                    name: "部门会议"
-                },
-                {
-                    id: 13,
-                    name: "大会2"
-                },
-                {
-                    id: 14,
-                    name: "开大会3"
-                },
-                {
-                    id: 15,
-                    name: "开大会4"
+                    name: "开大会3",
+                    collect: true
                 }
             ],
-            checkedCon: {},
+            checked: {},
+            setHeight: {}
         }
     },
     components: {
@@ -111,20 +81,40 @@ export default {
     methods: {
         // 选择收藏夹
         checkCollect(d){
-            console.log(d)
-            if(this.checkedCol[d.id]){
-                this.$set(this.checkedCol, d.id, false)
+            if(this.checked[d.id]){
+                this.$set(this.checked, d.id, false)
             }else{
-                this.$set(this.checkedCol, d.id, true)
+                this.$set(this.checked, d.id, d)
             }
+            this.$store.commit("setChecked", this.checked)
         },
         // 选择常用联系人
         checkContact(d){
-            console.log(d)
-            if(this.checkedCon[d.id]){
-                this.$set(this.checkedCon, d.id, false)
+            if(this.checked[d.id]){
+                this.$set(this.checked, d.id, false)
             }else{
-                this.$set(this.checkedCon, d.id, true)
+                this.$set(this.checked, d.id, d)
+            }
+            this.$store.commit("setChecked", this.checked)
+        },
+        // 收藏
+        clickCollect(index){
+            let d = this.contact[index]
+            d.collect = !d.collect
+            this.$set(this.contact, index, d)
+        },
+        // 开始会商
+        startMeeting(){
+            this.$router.push("/meeting")
+        }
+    },
+    created(){
+        this.checked = this.$store.state.checked
+    },
+    mounted(){
+        if(this.$refs.collect.offsetHeight < 167){
+            this.setHeight = {
+                height: this.$refs.index.offsetHeight - 184 - this.$refs.collect.offsetHeight + "px"
             }
         }
     }
@@ -140,6 +130,7 @@ export default {
     box-sizing: border-box;
     color: #B5E5F0;
     .cell{
+        display: block;
         padding: 10px 0;
         border-bottom: 1px solid rgba(30, 45, 63, .5);
         line-height: 20px;
@@ -167,12 +158,13 @@ export default {
         padding-bottom: 10px;
         border-bottom: 1px solid rgba(30, 45, 63, .5);
         .title{
+            height: 30px;
             margin-left: 20px;
-            padding: 5px 0;
+            line-height: 30px;
             color: #B5E5F0;
         }
         .scroll{
-            max-height: 120px;
+            max-height: 126px;
             overflow: hidden;
             overflow-y: auto;
             &::-webkit-scrollbar-track {
@@ -223,18 +215,17 @@ export default {
         }
     }
     .contact-box{
-        height: calc(100% - 244px);
+        height: calc(100% - 312px);
         .title{
             height: 30px;
             margin-left: 20px;
-            padding: 5px 0;
+            line-height: 30px;
             color: #B5E5F0;
         }
         .scroll{
-            height: calc( 100% - 42px);
+            height: calc( 100% - 30px);
             overflow: hidden;
             overflow-y: auto;
-            margin-bottom: 20px;
             &::-webkit-scrollbar-track {
                 box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
                 border-radius: 10px;
@@ -279,8 +270,28 @@ export default {
                         background-size: 24px 24px;
                     }
                 }
+                .icon-xing{
+                    width: 24px;
+                    height: 24px;
+                    padding: 8px 10px;
+                    background: url(../assets/xing.png) center center no-repeat;
+                    background-size: 24px 24px;
+                    &.icon-xing_sc{
+                        background: url(../assets/xing_sc.png) center center no-repeat;
+                        background-size: 24px 24px;
+                    }
+                }
             }
         }
+    }
+    .footer-btn{
+        margin: 10px 20px;
+        height: 40px;
+        background-color: #37B8E9;
+        text-align: center;
+        line-height: 40px;
+        color: #fff;
+        border-radius: 6px;
     }
 }
 </style>
