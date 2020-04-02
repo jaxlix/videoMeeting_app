@@ -21,5 +21,5 @@ export const api = {
 
   // 视频服务
   meetingWsUrl: 'wss://106.12.14.136:18086/videoMeetingService/groupcall',
-  meetingServiceUrl: 'https://106.12.14.136:18085/videoMeetingService/'
+  meetingServiceUrl: 'https://106.12.14.136:18086/videoMeetingService/'
 }

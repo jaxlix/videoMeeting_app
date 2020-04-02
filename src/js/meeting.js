@@ -161,7 +161,6 @@ const meetingApi = {
         }
     },
     createRoom: function(presidentId, callback) {
-        debugger
         let params = new URLSearchParams()
         params.append('presidentId', presidentId);
         post(api.meetingServiceUrl + "room/new", params).then(res => {

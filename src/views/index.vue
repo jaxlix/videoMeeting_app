@@ -1,6 +1,6 @@
 <template>
     <div id="index" ref="index">
-        <Header title="发起视频会商" rightBtn="toCheckedList" />
+        <Header title="发起视频会商" back="android" rightBtn="toCheckedList" />
         <router-link to="/search" class="cell">
             <i class="icon-search"></i>
             <span>通讯录搜索</span>

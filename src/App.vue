@@ -9,7 +9,7 @@
 <script>
     export default {
         created(){
-            let no = this.$route.query.uniqueNo || sessionStorage.getItem("UNIQUENO");
+            let no = this.$common.getQueryVariable("uniqueNo") || sessionStorage.getItem("UNIQUENO");
             if(!no){
                 this.$toast("未获取到警员编号，请退出重试")
                 return

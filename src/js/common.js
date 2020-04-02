@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 const common = {
-    dateFormatter: function (t, type) {
+    dateFormatter: (t, type) => {
         let time = new Date(parseInt(t))
         let year = time.getFullYear()
         let month = time.getMonth() + 1
@@ -36,6 +36,17 @@ const common = {
                 return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
                 break;
         }
+    },
+    getQueryVariable: (variable) => {
+        var query = window.location.href.substring(window.location.href.indexOf("?")+1).split("?")[0]
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){
+                return pair[1];
+            }
+        }
+        return(false);
     }
 }
 

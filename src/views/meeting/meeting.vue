@@ -2,6 +2,17 @@
     <div id="meeting">
         <Header title="返回" />
         <video autoplay class="video" id="video">Your browser does not support HTML5 video.</video>
+        <div v-for="d in playListFilter().slice(0, 9)" :key="d.uniqueNo" class="video-box" :class="'video-box-'+videoNum">
+            <video autoplay class="video" :id="'video-' + d.uniqueNo">
+                Your browser does not support HTML5 video.
+            </video>
+            <!-- <div class="watermark" :class="fullScreen===d.uniqueNo ? 'watermark_fullScreen' : ''">
+                <span>{{d.name}}</span>
+                <span>{{d.no}}</span>
+                <span v-show="d.deptName">({{d.deptName}})</span>
+            </div> -->
+            <!-- <img v-if="d.audioEnable == 0" class="jy" :class="fullScreen===d.uniqueNo ? 'jy_fullScreen' : ''" src="@/assets/icon/videoMeeting/jingyin.png" alt="静音"> -->
+        </div>
     </div>
 </template>
 
@@ -15,6 +26,8 @@ export default {
         return {
             currentUser: {},
             roomId: -1,
+            room: {},
+            magList: []
         };
     },
     components: {
@@ -28,36 +41,8 @@ export default {
     watch: {
         // ws是否连接成功
         meetingWsConnected(val){
-            if(val === true) {
-                if(this.roomId != -1) {
-                    this.$meetingApi.getRoomInfo(this.roomId, result => {
-                        this.room = result.data;
-                        this.$meetingApi.getRoomUsers(this.roomId, result => {
-                            this.magList = result.data;
-                            this.magList.forEach(mag => this.initUserSoundEnable(mag));
-                            this.$meetingApi.register(this.uniqueNo, this.roomId);
-                        });
-                    });
-                } else {
-                    this.$meetingApi.createRoom(this.uniqueNo, result => {
-                        debugger
-                        this.roomId = '' + result.data.id;
-                        this.room = result.data;
-                        this.$meetingApi.register(this.uniqueNo, result.data.id);
-                    });
-                }
-            }
-        },
-        // 获取roomId
-        roomId (val) {
-            let query = this.$router.history.current.query;
-            let path = this.$router.history.current.path;
-            //对象的拷贝
-            let newQuery = JSON.parse(JSON.stringify(query));
-            // 地址栏的参数值赋值
-            newQuery.roomId = val;
-            this.$router.push({ path, query: newQuery });
-        },
+            
+        }
     },
     methods: {
         // 获取当前用户信息
@@ -75,6 +60,7 @@ export default {
                         type: res.terminalMemberType,
                         uniqueNo: res.uniqueNo
                     }
+                    this.start()
                 }).catch(err => {
                     console.log(err)
                 })
@@ -98,6 +84,9 @@ export default {
             if (addUserList.length > 0) {
                 this.$meetingApi.addRoomUsers( this.roomId, addUserList, () => {
                     this.$meetingApi.getRoomUsers(this.roomId, result => {
+                        console.log("添加参会人员")
+                        console.log(result)
+                        console.log(this.room)
                         if (this.room.status == 0) {
                             this.magList = result.data;
                             var mag = _.findWhere(this.magList, item => {
@@ -116,23 +105,70 @@ export default {
                                 }
                             });
                         }
-                        this.showAdd = false;
                     });
                 });
             }
         },
         //开始视频会商
         start(){
-            if(this.magList.length > 1){
-                this.$meetingApi.startMeeting(this.roomId, (res)=>{
-                    this.room = res.data;
-                    this.play();
-                });
+           if(this.meetingWsConnected) {
+                if(this.roomId != -1) {
+                    this.$meetingApi.getRoomInfo(this.roomId, result => {
+                        this.room = result.data;
+                        this.$meetingApi.getRoomUsers(this.roomId, result => {
+                            this.magList = result.data;
+                            this.magList.forEach(mag => this.initUserSoundEnable(mag));
+                            this.$meetingApi.register(this.uniqueNo, this.roomId);
+                            this.$meetingApi.startMeeting(this.roomId, (res)=>{
+                                this.room = res.data;
+                                this.play();
+                            });
+                        });
+                    });
+                } else {
+                    this.$meetingApi.createRoom(this.uniqueNo, result => {
+                        console.log("创建房间成功")
+                        console.log(result)
+                        this.roomId = String(result.data.id)
+                        this.room = result.data;
+                        this.checkedData()
+                        // 
+                        this.$meetingApi.register(this.uniqueNo, result.data.id);
+                        this.$meetingApi.startMeeting(this.roomId, res => {
+                            console.log("开始会商")
+                            console.log(res)
+                            this.room = res.data;
+                            this.play();
+                        });
+                    });
+                }
             }else{
-                this.$message({
-                    message: "请添加人员",
-                    type: "warning"
-                })
+                this.$toast("meeting websocket连接未创建成功")
+            }
+        },
+        // 加载视频流
+        play() {
+            this.$nextTick(()=>{
+                let arr = this.playListFilter()
+                console.log("播放视频流")
+                console.log(arr)
+                arr.forEach(playItem => {
+                    var video = document.getElementById('video-' + playItem.uniqueNo);
+                    if(playItem.uniqueNo == this.currentUser.uniqueNo) {
+                        console.log("播放本机视频流")
+                        this.$meetingApi.sendOnly(video, !this.muted(playItem));
+                    } else {
+                        console.log("播放其他视频流")
+                        this.$meetingApi.receiveOnly(video, playItem.uniqueNo, !this.muted(playItem));
+                    }
+                });
+            });
+        },
+        playListFilter() {
+            if(this.room.status == 1) {
+                return _.filter(this.magList, mag => (mag.online || mag.uniqueNo == this.currentUser.uniqueNo));
+            } else {
+                return [];
             }
         },
         // 结束视频会商
@@ -150,7 +186,7 @@ export default {
                     })
                 });
             }
-        }
+        },
     },
     created(){
         this.uniqueNo = sessionStorage.getItem("UNIQUENO")
